@@ -7,7 +7,7 @@
 * [Su Timurturkan](https://github.com/sutimurturkan)
 
 ### Summary Figure
-![Project Infographic](../media/Rats_with_Hats_Project_Poster.jpg)
+![Project Infographic](Rats_with_Hats_Project_Poster.jpg)
 
 ### Introduction
 Albeit complex, animals think in predictable manners. This is what has allowed brain mappings. This visual cortex is the section of the brain responsible for transforming the raw signals from an animal's eyes into shapes and then into recognizable objects. 
