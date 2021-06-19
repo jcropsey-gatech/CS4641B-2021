@@ -2,7 +2,7 @@
 ### Contributors:
 * [Justin Cropsey](https://github.com/jcropsey-gatech)
 * [David Gordon](https://github.com/DavidCGordon)
-* Daniel Kim
+* [Daniel Kim](https://github.com/dkim857)
 * [Eirene Lakshita](https://github.com/eirenelakshita)
 * [Su Timurturkan](https://github.com/sutimurturkan)
 
