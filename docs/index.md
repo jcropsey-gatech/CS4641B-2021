@@ -44,19 +44,19 @@ Ten-bin [histograms](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot
 
 
 ### Results
-![K-Means Elbow Analysis over Raw Data](raw_kmeans_elbox2_40.png)
+![K-Means Elbow Analysis over Raw Data](raw_kmeans_elbow2_40.png)
 39.0, 322.0 = 0.8919667590027701
 153.0, 242.0 = 0.6126582278481013
 
-![K-Means Elbow Analysis over PCA-170 Entire Data](pca170_kmeans_elbox2_40.png)
+![K-Means Elbow Analysis over PCA-170 Entire Data](pca170_kmeans_elbow2_40.png)
 38.0, 320.0 = 0.8938547486033519
 154.0, 244.0 = 0.6130653266331658
 
-![K-Means Elbow Analysis over PCA-170 Affected Data](pca170_diseased_kmeans_elbox2_40.png)
+![K-Means Elbow Analysis over PCA-170 Affected Data](pca170_diseased_kmeans_elbow2_40.png)
 156.0, 247.0 = 0.6129032258064516
 36.0, 317.0 = 0.8980169971671388
 
-![K-Means Elbow Analysis over PCA-170 Unaffected Data](pca170_healthy_kmeans_elbox2_40.png)
+![K-Means Elbow Analysis over PCA-170 Unaffected Data](pca170_healthy_kmeans_elbow2_40.png)
 Explained variance 0.998356151725937
 44.0, 337.0 = 0.884514435695538
 148.0, 227.0 = 0.6053333333333333
