@@ -1,41 +1,181 @@
-# Rats with Hats
+# Rats without Hats
 ### Contributors:
 * [Justin Cropsey](https://github.com/jcropsey-gatech)
 * [David Gordon](https://github.com/DavidCGordon)
-* [Daniel Kim](https://github.com/dkim857)
-* [Eirene Lakshita](https://github.com/eirenelakshita)
 * [Su Timurturkan](https://github.com/sutimurturkan)
 
-### Summary Figure
+## Summary Figure
 ![Project Infographic](Rats_with_Hats_Project_Poster.jpg)
 
-### Introduction
-Albeit complex, animals think in predictable manners. This is what has allowed brain mappings. This visual cortex is the section of the brain responsible for transforming the raw signals from an animal's eyes into shapes and then into recognizable objects. 
+## Introduction
+Due to loss of team members and the complexity of the Allen Brain Observatory's data, we switched to Sohel Rana's [Parkinson's Disease Classification](https://www.kaggle.com/sohelranaccselab/parkinsons-disease-classification) (PDC) dataset on Kaggle.
 
-The Allen Brain Observatory, part of the Allen Institute, has compiled "a large-scale, standardized survey of physiological activity across the mouse" brain in their [Visual Coding](http://observatory.brain-map.org/visualcoding/) dataset. This dataset includes complementary imaging techniques from multiple electrodes embedded in different regions of the mouse's brain, including the visual cortex, hippocampus, and thalamus.
+[Parkinson's Disease](https://www.mayoclinic.org/diseases-conditions/parkinsons-disease/symptoms-causes/syc-20376055) (PD) is a progressive neurodegenerative disorder that is part of the Lewy Body Dementias umbrella that also includes [Dementia with Lewy Bodies](https://www.mayoclinic.org/diseases-conditions/lewy-body-dementia/symptoms-causes/syc-20352025) (DLB). As the name of the umbrella term implies, the defining characteristic of both disorders is the presence of Lewy bodies (plaques in the brain). While both disorders ultimately result in the same symptoms, the distinguisher between them is whether the tremor (PD) or another symptom appears first (DLB).
 
-For our project, we will apply the unstructured learning techniques taught in this class to categorize the data into various patterns. Afterwards, we will apply structured learning techniques to the annotated datasets to be able to predict what the visual stimulus was the mouse was observing during the recording.
+Like other diseases that caused by plaques in the brain (e.g., Alzheimer's disease), biopsy is off limits due to the dangers associated with neurosurgery. While a form of single-photon emission computerized tomography (SPECT) scan called a dopamine-transporter scan (DaTscan) can assist in diagnosis, it is expensive. Our goal is to elaborate a minimally invasive, low-cost solution using speech characteristics and machine learning to aid in diagnosis of PD.
 
-### Methods
-Firstly, we will apply unstructured machine learning to categorize the spatial-temporal data into clusters without regard to the visual stimulus and on a per-participant basis. We will then compare participants to gain an understanding of inter-participant generalizablity of the approach. We predict there will be distinct clustering observed per participant, presuming the visual stimuli are not degenerate in interpretation by the mouse. We believe the results will be reasonably extendable to inter-participant readings due to the similarities between brains, although some loss of precision is expected. 
+For our project, we will apply the unstructured learning techniques taught in this class to analyze over 750 dimensions of speech characteristics. Afterwards, we will apply structured learning techniques to the annotated datasets to be able to predict whether a patient exhibiting certain patterns of speech characteristics merits further evaluation for PD.
 
-Secondly, we will apply structure machine learning to the clusters and their respective labels so as to be able to predict the visual stimulus observed from a novel brain reading.
+## Methods
+The PDC dataset contains 754 different dimensions of data measuring various speech pathologies along with binary gender categorization. Each patient was sampled three times. There are 64 unaffected individuals and 188 affected individuals represented in the data set (756 samples total). No missing data points were observed in the data set. Following import, the data was split apart into various blocks (viz., headers, patient IDs, and X-Y data). The X-Y data (not including the disease classification (Y)) was scaled using Scikit-Learn's [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html).
 
-We believe such an approach will be successful because brain mapping is well-proven technology despite participants' differences. That is, even if the readings are not generalizable between individuals, the system should be able to predict what was being observed from different samplings of the same participant because brains function in a consistent manner.
+    scaler = StandardScaler()
+	scaler.fit(xDataFrame)
+	xNumPy = scaler.transform(xDataFrame);
 
-Because we are using a dataset that has already been collected, there is not any additional risks to animals. The costs are expected to be moderate due to the low resolution of the images compared to contemporary image sizes. The difficulty from this project arises due to the investigators' inexperience with many of the tools (e.g., HDF5, scikit-learn).
+The X-Y data set was sorted based on disease classification (Y) and split into unaffected vs affected sets at the boundary. The two sets were subsequently individually split by a common ratio into training vs testing sets, yielding unaffected-training, unaffected-testing, affected-training, and affected-testing set, while ensuring that all samples of a particular patient went into either their respective training or testing set but not both.
 
-### Results
-Our experiment will have four parts to its results. The first and second, our mid-term "exams" for success, are whether the data is clusterable and whether the clustering is generalizable between participants. The third and fourth parts extend these to determine whether visual stimuli can be predicted from brain readings and whether this is generalizable among participants. Success is defined as correctly predicting the visual stimulus with a probability greater than chance alone.
+A k-means elbow analysis in the range of k = \[4,40\] was performed on the entire data set using Yellowbrick's [K-Elbow Visualizer](https://www.scikit-yb.org/en/latest/api/cluster/elbow.html). Higher orders were examined in narrower ranges due to the increased processing time associated with higher orders.
 
-### Discussion
-Although a brain reading model raises many ethical questions, it also has great potential in furthering healthcare technology, particularly for people suffering from neurodenerative(e.g., Lou Gehrig's disease) or neuro-muscular (e.g., myasthenia gravis) disorders where the brain itself remains intact, but the suffer's ability to interact with the outside world is significantly impaired. This technology could be extended to provide them a means to communicate with the outside world after their motor abilities are lost.
+	model = KMeans();
+	visualizer = KElbowVisualizer(model, k=(2,40));
 
-### References
-[Allen Brain Map](https://portal.brain-map.org/explore/circuits/visual-coding-neuropixels)
+	visualizer.fit(xDataFrame)        # Fit the data to the visualizer
+	visualizer.show()
 
-[Machine learning for neural decoding](https://arxiv.org/ftp/arxiv/papers/1708/1708.00909.pdf)
+A direct k-means analysis with k = 2 (from the elbow method) was performed on the scaled X data set. The number of representatives in each cluster were tabulated to determine which cluster represented which disease status.
 
-[Real-Time Decoding of Nonstationary Neural Activity in Motor Cortex](https://ieeexplore.ieee.org/document/4483654)
+A [Principal Component Analysis](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (PCA) was performed with Scikit-Learn's PCA() over the entire X data set. n was chosen to be 170 because that represented 95.1% of the variance observed in the data. Another k-means elbow analysis in the range of k = \[2, 40\] was performed on the PCA transformed data. Again k was chosen to be 2, and a k-means analysis performed.
 
-[Frank Rosenblatt: Principles of Neurodynamics: Perceptrons and the Theory of Brain Mechanisms](https://link.springer.com/chapter/10.1007/978-3-642-70911-1_20)
+Under the assumption that PD is a collection of diseases due to heterogeneity in the rates of degeneration across the various neuroanatomical regions in patients, the PCA and subsequent k-means analysis was performed again, but with the PCA only fitted over the unaffected or the affected subsets of X. (Transformation was performed across the entire data set.) The goal was to identify a well-defined cluster of one of the disease states and then define the other state as everything else (i.e., universe - cluster). Due to the high explained-variance ratio when fitting PCA to unaffected data alone, an additional k = 6 k-means analysis was performed.
+
+A 2-component [Gaussian Mixture Model](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html) (GMM) was iteratively run over the scaled data set as well as a 170-component PCA fit to the entire data set. Each generated a [confusion matrix](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html) with the goal being to identify matrices where one of the diagonals is much larger than the other.
+
+Ten-bin [histograms](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html) were prepared on a 5-component PCA analysis fitted to the full, unaffected, and affected data sets, respectively.
+
+## Results
+Because the data set is unbalanced in the number of affected vs unaffected individuals, a randomly selected sample from the data set has a 74.6% probability of being affected. In the tables presented below, we are searching for methods that have noticeable deviation from probability due to chance alone.
+
+#### Fig. F1 - K-Means elbow analysis over entire scaled data set
+![K-Means Elbow Analysis over Raw Data](raw_kmeans_elbow2_40.png)
+
+#### Table T1 - Partitioning of unaffected vs affected into clusters by K-Means over entire scaled data set
+| Unaffected | Affected | Ratio |
+|----|----|----|
+| 39 | 322 | 0.892 |
+| 153 | 242 | 0.613 |
+
+#### Fig. F2 - K-Means elbow analysis over 170-component PCA data fit to entire data set
+![K-Means Elbow Analysis over PCA-170 Entire Data](pcF170_kmeans_elbow2_40.png)
+
+#### Table T2 - Partitioning of unaffected vs affected into clusters by K-Means over 170-component PCA data fit to entire data set
+| Unaffected | Affected | Ratio |
+|----|----|----|
+| 38 | 320 | 0.894 |
+| 154 | 244 | 0.613 |
+
+#### Fig. F3 - K-Means elbow analysis over 170-component PCA data fit to affected data set
+![K-Means Elbow Analysis over PCA-170 Affected Data](pcF170_diseased_kmeans_elbow2_40.png)
+
+#### Table T3 - Partitioning of unaffected vs affected into clusters by K-Means over 170-component PCA data fit to affected data set
+| Unaffected | Affected | Ratio |
+|----|----|----|
+| 156 | 247 | 0.613 |
+| 36 | 317 | 0.898 |
+
+#### Fig. F4 - K-Means elbow analysis over 170-component PCA data fit to unaffected data set
+![K-Means Elbow Analysis over PCA-170 Unaffected Data](pcF170_healthy_kmeans_elbow2_40.png)
+
+When the 170-component PCA was fitted to unaffected data, a 0.9984 explained variance was achieved.
+
+#### Table T4 - Partitioning of unaffected vs affected into clusters by K-Means over 170-component PCA data fit to unaffected data set
+| Unaffected | Affected | Ratio |
+|----|----|----|
+| 44 | 337 | 0.885 |
+| 148 | 227 | 0.605 |
+
+### K-Means Analysis (with k=6) over 170-component PCA fit to Unaffected Data
+
+#### Table T5 - Partitioning of unaffected vs affected into clusters by K-Means (k=6) over 170-component PCA data fit to unaffected data set
+| Unaffected | Affected | Ratio |
+|----|----|----|
+| 78 | 42 | 0.350 |
+| 58 | 159 | 0.733 |
+| 10 | 162 | 0.942 |
+| 19 | 106 | 0.848 |
+| 22 | 87 | 0.798 |
+| 5 | 8 | 0.615 |
+
+### Figs. F5 - Two-Component GMM on 170-component PCA fitted to the entire data set
+![GMM Confusion Matrix 1](gmm_confusionmatrix_1.png)
+![GMM Confusion Matrix 2](gmm_confusionmatrix_2.png)
+![GMM Confusion Matrix 3](gmm_confusionmatrix_3.png)
+![GMM Confusion Matrix 4](gmm_confusionmatrix_4.png)
+![GMM Confusion Matrix 5](gmm_confusionmatrix_5.png)
+
+### Figs. F6 - Five-Component PCA Fitted to Full Data Set
+![PCA Component 2 vs. PCA Component 1](full_pcF5_1_2.png)
+![PCA Component 3 vs. PCA Component 1](full_pcF5_1_3.png)
+![PCA Component 4 vs. PCA Component 1](full_pcF5_1_4.png)
+![PCA Component 3 vs. PCA Component 2](full_pcF5_2_3.png)
+![PCA Component 4 vs. PCA Component 2](full_pcF5_2_4.png)
+![PCA Component 4 vs. PCA Component 3](full_pcF5_3_4.png)
+
+### Figs. F7 - Five-Component PCA Fitted to Affected Data Set
+![PCA Component 2 vs. PCA Component 1](affected_pcF5_1_2.png)
+![PCA Component 3 vs. PCA Component 1](affected_pcF5_1_3.png)
+![PCA Component 4 vs. PCA Component 1](affected_pcF5_1_4.png)
+![PCA Component 3 vs. PCA Component 2](affected_pcF5_2_3.png)
+![PCA Component 4 vs. PCA Component 2](affected_pcF5_2_4.png)
+![PCA Component 4 vs. PCA Component 3](affected_pcF5_3_4.png)
+
+### Figs. F8 - Five-Component PCA Fitted to Unaffected Data Set
+![PCA Component 2 vs. PCA Component 1](unaffected_pcF5_1_2.png)
+![PCA Component 3 vs. PCA Component 1](unaffected_pcF5_1_3.png)
+![PCA Component 4 vs. PCA Component 1](unaffected_pcF5_1_4.png)
+![PCA Component 3 vs. PCA Component 2](unaffected_pcF5_2_3.png)
+![PCA Component 4 vs. PCA Component 2](unaffected_pcF5_2_4.png)
+![PCA Component 4 vs. PCA Component 3](unaffected_pcF5_3_4.png)
+
+### Figs. F9 - Ten-Bin Histogram of 5-Component PCA Fitted to Full Data Set
+![Histogram of PCA Component 1](hist10_full_component1.png)
+![Histogram of PCA Component 2](hist10_full_component2.png)
+![Histogram of PCA Component 3](hist10_full_component3.png)
+![Histogram of PCA Component 4](hist10_full_component4.png)
+![Histogram of PCA Component 5](hist10_full_component5.png)
+
+### Figs. F10 - Ten-Bin Histogram of 5-Component PCA Fitted to Affected Data Set
+![Histogram of PCA Component 1](hist10_affected_component1.png)
+![Histogram of PCA Component 2](hist10_affected_component2.png)
+![Histogram of PCA Component 3](hist10_affected_component3.png)
+![Histogram of PCA Component 4](hist10_affected_component4.png)
+![Histogram of PCA Component 5](hist10_affected_component5.png)
+
+### Figs. F11 - Ten-Bin Histogram of 5-Component PCA Fitted to Unaffected Data Set
+![Histogram of PCA Component 1](hist10_unaffected_component1.png)
+![Histogram of PCA Component 2](hist10_unaffected_component2.png)
+![Histogram of PCA Component 3](hist10_unaffected_component3.png)
+![Histogram of PCA Component 4](hist10_unaffected_component4.png)
+![Histogram of PCA Component 5](hist10_unaffected_component5.png)
+
+## Discussion
+The most obvious problems with our data are the presence of numerous outliers, and the amount of overlap of affected and unaffected individuals. This is most salient from the K-Means "elbow" plots (Figures F1, F2, F3, and F4), which resemble nothing like what an elbow plot should.
+
+As noted in the Results, the data set is biased towards affected individuals by almost 3:1. K-means alone was able to do better than random chance by 17.8% and 19.6% unaffected vs affected, respectively.
+
+The 170-component PCA had lackluster performance in improving the categorization of data relative to a simple K-means clustering on scaled data (0.613:0.894 vs 0.613:0.892). Ironically, fitting the 170-component PCA to only the unaffected data improved the amount of explained variance (99.84% vs 95.1%) but had little impact on the categorization (0.605:0.885 vs 0.613:0.892). This evidences the belief that unaffected individuals constitute a cluster whereas affected individuals are outliers.
+
+Table T6 with the results of the 6-cluster K-means analysis over the 170-compoent PCA data fitted to the unaffected data set provides a counterargument to this belief due to its above average clustering of affected individuals. As noted in the Introduction, PD is a collection of diseases depending on which nuclei are affected and their respective severities.
+
+Gaussian Mixture Modeling provided interesting results: The results were non-probabilistic (i.e., most entries were classified into a single cluster). In other words, it reduced itself to K-mean. Figures F5 shows a subset of the the confusion matrices resulting from GMM. While we did see the some of the desired results of one of the diagonals being much stronger than the other, given the nature of implications, none of them reached a level where we would feel confident enough to use them for this problem.
+
+Figures F6, F7, and F8 are scatter plots of the various PCA components against each other. They serve to ellucidate the problem with the data overlapping. (The opacity was not attenuated with these graphs, and thus, the orange conceals some of the blue points.)
+
+Figures F9, F10, and F11 are 10-bin histograms of 170-component PCA data fitted to the entire, affected, and unaffected data sets, respectively. When fit to the full data set, the primary PCA component exhibits the most distinction between the two disease states. However, when fit to a biased disease state, higher-order components do contribute to the distinction.
+
+Fitting the PCA to the affected state produced some interesting results: The primary component showed more spread compared to the unaffected group, evidencing that PD is a collection of diseases. The secondary component showed a rightward shift in the affected group. The higher-order components do show additional differences, but not as significant as the lower-order components.
+
+Fitting the PCA to the unaffected state also produced some interesting results: There are distinct shifts in the affected group relative to the unaffected group. Components 1 and 5 show a concentrating effect, which is to be expected with a neuromuscular disease like PD and its loss of fluidity of movement (and speech).
+
+DBSCAN was also performed on the data but failed to perform better than random and thus is not included in the Results.
+
+## References
+[Prediction of Parkinson's disease using speech signal with Extreme Learning Machine](https://ieeexplore.ieee.org/abstract/document/7755419?casa_token=1aO88moUx48AAAAA:uT2CWrt38kw_ULeQK_zidk_ZMNRbEiTi9nNxtUOF3BNBoEbGqBD4UvQZ3chF4Od7-JtjG-i6)
+
+[Parkinson’s Disease Diagnosis in Cepstral Domain Using MFCC
+and Dimensionality Reduction with SVM Classifier](https://www.hindawi.com/journals/misy/2021/8822069/)
+
+[LSTM Siamese Network for Parkinson’s Disease Detection
+from Speech](https://ieeexplore.ieee.org/abstract/document/8969430?casa_token=IgSUTOkHeJoAAAAA:7DZe463IBhOllBG6uAAlPxUdaIbt9q0qRaykNNijhjD-xXcyW3Ks4WBwwozB8DnbAiL2IZF9)
+
+[Collection and Analysis of a Parkinson Speech Dataset With Multiple Types of Sound Recordings](https://www.researchgate.net/publication/260662600_Collection_and_Analysis_of_a_Parkinson_Speech_Dataset_With_Multiple_Types_of_Sound_Recordings)
