@@ -4,6 +4,10 @@
 * [David Gordon](https://github.com/DavidCGordon)
 * [Su Timurturkan](https://github.com/sutimurturkan)
 
+## Media
+[PowerPoint](ML Team Project Final Presentation.pptx)
+[Presentation](ML Team Project Final Presentation.mp4)
+
 ## Summary Figure
 ![Project Infographic](Rats_with_Hats_Project_Poster.jpg)
 
