@@ -7,6 +7,7 @@
 ## Media
 [PowerPoint](ML Team Project Final Presentation.pptx)
 [Presentation](ML Team Project Final Presentation.mp4)
+[Jupyter Notebook](ratsWithHats.ipynb)
 
 ## Summary Figure
 ![Project Infographic](Rats_with_Hats_Project_Poster.jpg)
