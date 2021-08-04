@@ -31,7 +31,7 @@ The X-Y data set was sorted based on disease classification (Y) and split into u
 
 ### Unsupervised
 
-A k-means elbow analysis in the range of $k = \[4,40\]$ was performed on the entire data set using Yellowbrick's [K-Elbow Visualizer](https://www.scikit-yb.org/en/latest/api/cluster/elbow.html). Higher orders were examined in narrower ranges due to the increased processing time associated with higher orders.
+A k-means elbow analysis in the range of k = \[4,40\] was performed on the entire data set using Yellowbrick's [K-Elbow Visualizer](https://www.scikit-yb.org/en/latest/api/cluster/elbow.html). Higher orders were examined in narrower ranges due to the increased processing time associated with higher orders.
 
 	model = KMeans();
 	visualizer = KElbowVisualizer(model, k=(2,40));
@@ -39,9 +39,9 @@ A k-means elbow analysis in the range of $k = \[4,40\]$ was performed on the ent
 	visualizer.fit(xDataFrame)        # Fit the data to the visualizer
 	visualizer.show()
 
-A direct k-means analysis with $k = 2$ (from the elbow method) was performed on the scaled X data set. The number of representatives in each cluster were tabulated to determine which cluster represented which disease status.
+A direct k-means analysis with k = 2 (from the elbow method) was performed on the scaled X data set. The number of representatives in each cluster were tabulated to determine which cluster represented which disease status.
 
-A [Principal Component Analysis](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (PCA) was performed with Scikit-Learn's PCA() over the entire X data set. $n$ was chosen to be 170 because that represented 95.1% of the variance observed in the data. Another k-means elbow analysis in the range of $k = \[2, 40\]$ was performed on the PCA transformed data. Again k was chosen to be 2, and a k-means analysis performed.
+A [Principal Component Analysis](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (PCA) was performed with Scikit-Learn's PCA() over the entire X data set. n was chosen to be 170 because that represented 95.1% of the variance observed in the data. Another k-means elbow analysis in the range of k = \[2, 40\] was performed on the PCA transformed data. Again k was chosen to be 2, and a k-means analysis performed.
 
 Under the assumption that PD is a collection of diseases due to heterogeneity in the rates of degeneration across the various neuroanatomical regions in patients, the PCA and subsequent k-means analysis was performed again, but with the PCA only fitted over the unaffected or the affected subsets of X. (Transformation was performed across the entire data set.) The goal was to identify a well-defined cluster of one of the disease states and then define the other state as everything else (i.e., universe - cluster). Due to the high explained-variance ratio when fitting PCA to unaffected data alone, an additional k = 6 k-means analysis was performed.
 
@@ -63,7 +63,7 @@ To compensate for bias in the data set due to the overrepresentation of affected
 
 A 100-component PCA transform was fitted to unaffected, original-representation data and then feed into the NN. Again, various combinations of layer count, layer density, activations, and epochs were explored.
 
-Adding a $validation\_split$ argument to the $fit()$ was also explored.
+Adding a validation\_split argument to the fit() was also explored.
 
 A Random Forest was performed using Scikit-Learn. Various combinations of maximum depth, criterion, features, and number of estimators were explored.
 
@@ -219,7 +219,7 @@ Preprocessing the data with PCA also yielded lackluster results due to the low e
 
 To our disappointment, compensating with SMOTE had no effect since it was performed only on the training data and ultimately yielded already represented individuals.
 
-We were initially enthusiastic with adding $validation\_split$ to the NN because it achieved approximately 95% accuracy on both training and validation. Testing on the testing data set, however, achieved average results. We subsequently realized this was because of the triplicate nature of our data set: The validation data set was in effect a subset of the training data set and thus was already known to the NN. This confirmed our suspicion that maintaining all of an individual's samples in the same grouping (viz., training, validation, or testing) was the appropriate way to handle multiple samples from the same individual. In other words, the intraperson variance is smaller than the interperson variance.
+We were initially enthusiastic with adding validation\_split to the NN because it achieved approximately 95% accuracy on both training and validation. Testing on the testing data set, however, achieved average results. We subsequently realized this was because of the triplicate nature of our data set: The validation data set was in effect a subset of the training data set and thus was already known to the NN. This confirmed our suspicion that maintaining all of an individual's samples in the same grouping (viz., training, validation, or testing) was the appropriate way to handle multiple samples from the same individual. In other words, the intraperson variance is smaller than the interperson variance.
 
 A subsequent comparison of predicted vs. actual categorization sorted by individual revealed that, while single and double failures do happen, many failures tended to happen in triples as would be expected with triplicate data. The system simply could not accurately classify a constellation of symptoms it had never observed before.
 
@@ -235,7 +235,7 @@ The first and foremost effort needs to be to augment the data set so that it is 
 
 Due to time limitations we were unable to randomly assign individuals (with their 3 samples) into training, validation, and testing data sets. This presents the real possibility of a sampling error simply because they were always assigned based on their order in the original data set.
 
-A second promising effort is to manually compare $\mu$ and $\sigma$ between unaffected and affected with the goal of identifying which features are discriminative between them. Then a simple score card could be devised where if an individual was "outside" of "normal" on a minimum number of dimensions, then the person could be referred for further analysis.
+A second promising effort is to manually compare mu and sigma between unaffected and affected with the goal of identifying which features are discriminative between them. Then a simple score card could be devised where if an individual was "outside" of "normal" on a minimum number of dimensions, then the person could be referred for further analysis.
 
 ## Acknowledgements
 
