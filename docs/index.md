@@ -84,7 +84,7 @@ Because the data set is unbalanced in the number of affected vs unaffected indiv
 | 153 | 242 | 0.613 |
 
 #### Fig. F2 - K-Means elbow analysis over 170-component PCA data fit to entire data set
-![K-Means Elbow Analysis over PCA-170 Entire Data](pcF170_kmeans_elbow2_40.png)
+![K-Means Elbow Analysis over PCA-170 Entire Data](pca170_kmeans_elbow2_40.png)
 
 #### Table T2 - Partitioning of unaffected vs affected into clusters by K-Means over 170-component PCA data fit to entire data set
 | Unaffected | Affected | Ratio |
@@ -93,7 +93,7 @@ Because the data set is unbalanced in the number of affected vs unaffected indiv
 | 154 | 244 | 0.613 |
 
 #### Fig. F3 - K-Means elbow analysis over 170-component PCA data fit to affected data set
-![K-Means Elbow Analysis over PCA-170 Affected Data](pcF170_diseased_kmeans_elbow2_40.png)
+![K-Means Elbow Analysis over PCA-170 Affected Data](pca170_diseased_kmeans_elbow2_40.png)
 
 #### Table T3 - Partitioning of unaffected vs affected into clusters by K-Means over 170-component PCA data fit to affected data set
 | Unaffected | Affected | Ratio |
@@ -102,7 +102,7 @@ Because the data set is unbalanced in the number of affected vs unaffected indiv
 | 36 | 317 | 0.898 |
 
 #### Fig. F4 - K-Means elbow analysis over 170-component PCA data fit to unaffected data set
-![K-Means Elbow Analysis over PCA-170 Unaffected Data](pcF170_healthy_kmeans_elbow2_40.png)
+![K-Means Elbow Analysis over PCA-170 Unaffected Data](pca170_healthy_kmeans_elbow2_40.png)
 
 When the 170-component PCA was fitted to unaffected data, a 0.9984 explained variance was achieved.
 
