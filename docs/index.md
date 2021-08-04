@@ -5,8 +5,11 @@
 * [Su Timurturkan](https://github.com/sutimurturkan)
 
 ## Media
+
 [PowerPoint](ML Team Project Final Presentation.pptx)
+
 [Presentation](ML Team Project Final Presentation.mp4)
+
 [Jupyter Notebook](ratsWithHats.ipynb)
 
 ## Summary Figure
@@ -222,7 +225,7 @@ To our disappointment, compensating with SMOTE had no effect since it was perfor
 
 We were initially enthusiastic with adding validation\_split to the NN because it achieved approximately 95% accuracy on both training and validation. Testing on the testing data set, however, achieved average results. We subsequently realized this was because of the triplicate nature of our data set: The validation data set was in effect a subset of the training data set and thus was already known to the NN. This confirmed our suspicion that maintaining all of an individual's samples in the same grouping (viz., training, validation, or testing) was the appropriate way to handle multiple samples from the same individual. In other words, the intraperson variance is smaller than the interperson variance.
 
-A subsequent comparison of predicted vs. actual categorization sorted by individual revealed that, while single and double failures do happen, many failures tended to happen in triples as would be expected with triplicate data. The system simply could not accurately classify a constellation of symptoms it had never observed before.
+A subsequent comparison of predicted vs actual categorization sorted by individual revealed that, while single and double failures do happen, many failures tended to happen in triples as would be expected with triplicate data. The system simply could not accurately classify a constellation of symptoms it had never observed before.
 
 The Random Forest did not realize any better results because it was encountering the same problems as the NN.
 
