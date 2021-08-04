@@ -25,6 +25,8 @@ The PDC dataset contains 754 different dimensions of data measuring various spee
 
 The X-Y data set was sorted based on disease classification (Y) and split into unaffected vs affected sets at the boundary. The two sets were subsequently individually split by a common ratio into training vs testing sets, yielding unaffected-training, unaffected-testing, affected-training, and affected-testing set, while ensuring that all samples of a particular patient went into either their respective training or testing set but not both.
 
+### Unsupervised
+
 A k-means elbow analysis in the range of k = \[4,40\] was performed on the entire data set using Yellowbrick's [K-Elbow Visualizer](https://www.scikit-yb.org/en/latest/api/cluster/elbow.html). Higher orders were examined in narrower ranges due to the increased processing time associated with higher orders.
 
 	model = KMeans();
@@ -43,7 +45,28 @@ A 2-component [Gaussian Mixture Model](https://scikit-learn.org/stable/modules/g
 
 Ten-bin [histograms](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html) were prepared on a 5-component PCA analysis fitted to the full, unaffected, and affected data sets, respectively.
 
+### Supervised
+
+For a baseline, a Scikit-Learn Gaussian Naive Bayes was performed.
+
+Due to the overlapping nature of the two categories of data, it was decided to go directly to a neural net (NN) for the next efforts. Keras and TensorFlow were selected as the frameworks.
+
+We experimented with various configurations of NNs, starting with a sequential three-layer NN on grouped-by-individual raw data. The layers were dense and consisted of 188, 4, and 1 neuron(s) per layer respectively, each with sigmoid activation.
+
+Oscillations in the accuracy during training were observed and were traced back to unnormalized data. After fixing this with StandardScaler(), we achieved 100% accuracy on the training data after relatively few epochs, indicating overfitting. After reducing the number of epochs, various combinations of number of layers, density of each layer, activations (rectified linear uint (ReLU) and sigmoid), and epochs were explored.
+
+To compensate for bias in the data set due to the overrepresentation of affected individuals, unaffected individuals were oversampled via [Synthetic Minority Oversampling Technique (SMOTE)](https://imbalanced-learn.org/stable/references/generated/imblearn.over_sampling.SMOTE.html).
+
+A 100-component PCA transform was fitted to unaffected, original-representation data and then feed into the NN. Again, various combinations of layer count, layer density, activations, and epochs were explored.
+
+Adding a $validation\_split$ argument to the $fit()$ was also explored.
+
+A Random Forest was performed using Scikit-Learn. Various combinations of maximum depth, criterion, features, and number of estimators were explored.
+
 ## Results
+
+### Unsupervised
+
 Because the data set is unbalanced in the number of affected vs unaffected individuals, a randomly selected sample from the data set has a 74.6% probability of being affected. In the tables presented below, we are searching for methods that have noticeable deviation from probability due to chance alone.
 
 #### Fig. F1 - K-Means elbow analysis over entire scaled data set
@@ -148,14 +171,25 @@ When the 170-component PCA was fitted to unaffected data, a 0.9984 explained var
 ![Histogram of PCA Component 4](hist10_unaffected_component4.png)
 ![Histogram of PCA Component 5](hist10_unaffected_component5.png)
 
+### Supervised
+
+The Gaussian Naive Bayes achieved an accuracy of approximately 69% on the testing data set.
+
+Despite the numerous combinations of setups, Keras and TensorFlow consistently achieved 72% +/- 2% on testing data.
+
+The Random Forest achieved a weighted average 75% on the recall.
+
 ## Discussion
+
+### Unsupervised
+
 The most obvious problems with our data are the presence of numerous outliers, and the amount of overlap of affected and unaffected individuals. This is most salient from the K-Means "elbow" plots (Figures F1, F2, F3, and F4), which resemble nothing like what an elbow plot should.
 
 As noted in the Results, the data set is biased towards affected individuals by almost 3:1. K-means alone was able to do better than random chance by 17.8% and 19.6% unaffected vs affected, respectively.
 
 The 170-component PCA had lackluster performance in improving the categorization of data relative to a simple K-means clustering on scaled data (0.613:0.894 vs 0.613:0.892). Ironically, fitting the 170-component PCA to only the unaffected data improved the amount of explained variance (99.84% vs 95.1%) but had little impact on the categorization (0.605:0.885 vs 0.613:0.892). This evidences the belief that unaffected individuals constitute a cluster whereas affected individuals are outliers.
 
-Table T6 with the results of the 6-cluster K-means analysis over the 170-compoent PCA data fitted to the unaffected data set provides a counterargument to this belief due to its above average clustering of affected individuals. As noted in the Introduction, PD is a collection of diseases depending on which nuclei are affected and their respective severities.
+Table T6 with the results of the 6-cluster K-means analysis over the 170-component PCA data fitted to the unaffected data set provides a counterargument to this belief due to its above average clustering of affected individuals. As noted in the Introduction, PD is a collection of diseases depending on which nuclei are affected and their respective severities.
 
 Gaussian Mixture Modeling provided interesting results: The results were non-probabilistic (i.e., most entries were classified into a single cluster). In other words, it reduced itself to K-mean. Figures F5 shows a subset of the the confusion matrices resulting from GMM. While we did see the some of the desired results of one of the diagonals being much stronger than the other, given the nature of implications, none of them reached a level where we would feel confident enough to use them for this problem.
 
@@ -168,6 +202,40 @@ Fitting the PCA to the affected state produced some interesting results: The pri
 Fitting the PCA to the unaffected state also produced some interesting results: There are distinct shifts in the affected group relative to the unaffected group. Components 1 and 5 show a concentrating effect, which is to be expected with a neuromuscular disease like PD and its loss of fluidity of movement (and speech).
 
 DBSCAN was also performed on the data but failed to perform better than random and thus is not included in the Results.
+
+### Supervised
+
+All of the methods we attempted yielded similar results.
+
+Gaussian Naive Bayes, at 69% accuracy, was 5% below the intrinsic bias of the data set (74.6%).
+
+Keras and TensorFlow provided equally unimpressive results despite the various combinations of setups. Even though most setups were able to achieve 100% accuracy, they achieved sub intrinsic bias scores on the testing data.
+
+Preprocessing the data with PCA also yielded lackluster results due to the low explained variance even for 100-component transformation.
+
+To our disappointment, compensating with SMOTE had no effect since it was performed only on the training data and ultimately yielded already represented individuals.
+
+We were initially enthusiastic with adding $validation\_split$ to the NN because it achieved approximately 95% accuracy on both training and validation. Testing on the testing data set, however, achieved average results. We subsequently realized this was because of the triplicate nature of our data set: The validation data set was in effect a subset of the training data set and thus was already known to the NN. This confirmed our suspicion that maintaining all of an individual's samples in the same grouping (viz., training, validation, or testing) was the appropriate way to handle multiple samples from the same individual. In other words, the intraperson variance is smaller than the interperson variance.
+
+A subsequent comparison of predicted vs. actual categorization sorted by individual revealed that, while single and double failures do happen, many failures tended to happen in triples as would be expected with triplicate data. The system simply could not accurately classify a constellation of symptoms it had never observed before.
+
+The Random Forest did not realize any better results because it was encountering the same problems as the NN.
+
+What was ultimately realized is that (1) there is a lot of diversity in the manifestation of symptoms with PD, and (2) the data set used was simply too small to capture this diversity.
+
+There are two lights at the end of the tunnel: The first is that this is a very solvable problem with machine learning given the high accuracy achieved on already seen data. It simply needs to have experienced an individual with a similiar manifestation. The second, alternative approach is that it should be possible to pair down the fields to a subset of significant ones and then score how differently a sample is from "normal".
+
+## Future Work
+
+The first and foremost effort needs to be to augment the data set so that it is more representative of the PD community. This should allow a NN to be trained and accurately predict PD.
+
+Due to time limitations we were unable to randomly assign individuals (with their 3 samples) into training, validation, and testing data sets. This presents the real possibility of a sampling error simply because they were always assigned based on their order in the original data set.
+
+A second promising effort is to manually compare $\mu$ and $\sigma$ between unaffected and affected with the goal of identifying which features are discriminative between them. Then a simple score card could be devised where if an individual was "outside" of "normal" on a minimum number of dimensions, then the person could be referred for further analysis.
+
+## Acknowledgements
+
+We wish to thank Professor Rodrigo Borela and Karan Singh of Georgia Tech for all their assistance with this project.
 
 ## References
 [Prediction of Parkinson's disease using speech signal with Extreme Learning Machine](https://ieeexplore.ieee.org/abstract/document/7755419?casa_token=1aO88moUx48AAAAA:uT2CWrt38kw_ULeQK_zidk_ZMNRbEiTi9nNxtUOF3BNBoEbGqBD4UvQZ3chF4Od7-JtjG-i6)
