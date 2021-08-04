@@ -62,7 +62,7 @@ Oscillations in the accuracy during training were observed and were traced back 
 
 To compensate for bias in the data set due to the overrepresentation of affected individuals, unaffected individuals were oversampled via [Synthetic Minority Oversampling Technique (SMOTE)](https://imbalanced-learn.org/stable/references/generated/imblearn.over_sampling.SMOTE.html).
 
-A 100-component PCA transform was fitted to unaffected, original-representation data and then feed into the NN. Again, various combinations of layer count, layer density, activations, and epochs were explored.
+A 100-component PCA transform was fitted to unaffected, original-representation data and then fed into the NN. Again, various combinations of layer count, layer density, activations, and epochs were explored.
 
 Adding a validation\_split argument to the fit() was also explored.
 
